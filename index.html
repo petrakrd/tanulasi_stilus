@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tanulási stílus – önpontozó kérdőív</title>
+<style>
+:root{--bg:#faf8f4;--fg:#222;--mut:#6b6b6b;--card:#fff;--line:#ddd6c8;--acc:#2f6f6a;--band:#c9d9d6;--warn:#b3402a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1d1f;--fg:#ece9e2;--mut:#a09d95;--card:#26282b;--line:#3b3e42;--acc:#6fc2ba;--band:#3c5855;--warn:#ef8a74}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 Georgia,"Times New Roman",serif}
+.w{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:1.6rem;margin:.2em 0}
+.mut{color:var(--mut);font-size:.92rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:12px 0}
+.q{display:block}
+.q.miss{border-color:var(--warn)}
+.q p{margin:0 0 8px}
+.n{color:var(--mut);margin-right:6px}
+.opts{display:flex;gap:8px}
+.opts label{flex:1;text-align:center;border:1px solid var(--line);border-radius:8px;padding:8px 0;cursor:pointer;font-family:system-ui,sans-serif}
+.opts input{position:absolute;opacity:0}
+.opts label:has(input:checked){background:var(--acc);color:var(--bg);border-color:var(--acc)}
+.legend{display:flex;justify-content:space-between;font-size:.78rem;color:var(--mut);margin-top:3px;font-family:system-ui,sans-serif}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:8px 0;z-index:5}
+.pr{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.pr i{display:block;height:100%;width:0;background:var(--acc)}
+button{font:inherit;font-family:system-ui,sans-serif;padding:10px 18px;border-radius:8px;border:1px solid var(--acc);background:var(--acc);color:var(--bg);cursor:pointer}
+button.s{background:none;color:var(--acc)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.sc{margin:16px 0}
+.sc h3{margin:0;font-size:1rem;display:flex;justify-content:space-between;gap:8px}
+.tr{position:relative;height:22px;margin:8px 0 2px;background:linear-gradient(var(--line),var(--line)) center/100% 2px no-repeat}
+.bd{position:absolute;top:3px;height:16px;background:var(--band);border-radius:3px}
+.mk{position:absolute;top:0;width:4px;height:22px;margin-left:-2px;background:var(--acc);border-radius:2px}
+.tk{display:flex;justify-content:space-between;font-size:.75rem;color:var(--mut);font-family:system-ui,sans-serif}
+.tag{font-size:.82rem;font-family:system-ui,sans-serif;white-space:nowrap}
+.d{font-size:.85rem;color:var(--mut)}
+#res{display:none}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>Tanulási stílus – önpontozó kérdőív</h1>
+<p class="mut">Bernáth László, N. Kollár Katalin, Németh Lilla: A tanulási stílus mérése (Tanulási stílus 2. kérdőív, 57 tétel). Az állításokat az eredeti szövegezéssel közöljük, szemléltetési céllal.</p>
+<div class="card" id="intro">
+<p>Olvasd el az állításokat, és válaszd ki, mennyire jellemző rád. Nincsenek jó vagy rossz válaszok, csak a saját véleményed számít. A 3-as választ csak ritkán használd.</p>
+<p class="mut">1 = Egyáltalán nem jellemző rám · 2 = Nem jellemző · 3 = Nem tudom eldönteni · 4 = Jellemző · 5 = Nagyon jellemző rám.<br>Az oldal nem tárol és nem küld el semmit.</p>
+</div>
+<div class="bar"><div class="pr"><i id="pb"></i></div><div class="mut" id="pt">0 / 57</div></div>
+<div id="qs"></div>
+<div class="row"><button id="go">Profilom megjelenítése</button><button class="s" id="demo">Példa-kitöltés (bemutatáshoz)</button></div>
+<p class="mut" id="err" style="color:var(--warn)"></p>
+
+<div id="res">
+<h2>A te tanulási stílus profilod</h2>
+<p class="d">A sötétebb sáv a diákmintás átlagos tartomány (átlag ± 0,5 szórás), a függőleges jel a te skálaátlagod (1–5). A sávok általános és középiskolás diákok (N≈590) mintájából származnak, hallgatókra nem érvényes normák, ezért tájékoztató jellegűek. A profilban a skálák egymáshoz viszonyított sorrendje a leginformatívabb.</p>
+<div class="card" id="chart"></div>
+<p class="d">Ez önbevallásos preferencia-kérdőív, nem diagnózis: nem azt mutatja, mivel tanulsz hatékonyabban, hanem hogy mit kedvelsz.</p>
+<div class="row"><button class="s" id="again">Újrakezdés</button></div>
+</div>
+</div>
+<script>
+var T=["Nyugtalanít, ha tanulás közben csend van körülöttem.","Könnyebben meg tudok tanulni egy új dolgot, ha megmutatják, mintha szóban elmondják.","Jól tudok füzetből tanulni.","Látnom kell a megtanulandó szöveget ahhoz, hogy megjegyezzem.","Könnyebben megértem a tanár magyarázatát, ha egy ábrával vagy táblázattal szemlélteti.","Tudni szoktam, hogy mi a logikája az alfejezetek sorrendjének a tananyagban.","Gyakran előfordul, hogy megtalálom egy feladat megoldását, de nem tudom elmondani, hogyan jutottam a megoldásra.","Tanulás közben szeretek járkálni.","Élvezem, ha egy tanár olyan kérdéseket tesz fel, amin gondolkodni kell.","Szeretem, ha párban kapjuk a feladatokat az órán.","Jobban szeretem az olyan feladatokat, ahol mozdulatokat kell megtanulnom.","Ha látom a megtanulandó szöveget, könnyebben megjegyzem.","Könnyebben tanulok meg egy bekezdést a tankönyvből, ha átlátom, hogyan kapcsolódik az előző és a következő bekezdéshez.","A tanári magyarázat nem sokat jelent nekem, inkább tankönyvből tanulok.","Könnyebben megy a tanulás, ha közben mozoghatok.","Inkább egyedül szeretek dolgozni.","Szeretek problémákon gondolkodni.","Jobban szeretek táncolni, mint tanulni.","Nagyon hasznos számomra, ha a tanár ábrákat mutat, amikor magyaráz.","Gyakran úgy tanulom meg a dolgokat, hogy a tanár magyarázatát jegyzem meg.","Jobban megy nekem az olyan feladat, ahol valamilyen mozdulatot kell megtanulnom.","Hangosan szoktam elolvasni a tananyag szövegét, amikor felkészülök.","Jobban szeretem a tanár magyarázatát meghallgatni, mint ha a könyvből kellene megtanulni az anyagot.","Teljes csendben tudok csak tanulni.","Ha vannak ábrák, rajzok a könyvben, könnyebb a tanulás.","Könnyen jegyzek meg mozdulatokat.","Jól tudok úgy tanulni, ha csak némán olvasva átveszem a leckét.","Azt jegyzem meg könnyen, amit a tanár elmond.","A csoportmunka nekem segít, hogy jobban menjen a tanulás.","Szeretem aláhúzni vagy színessel kiemelni a lényeget a szövegben.","Gyakran előfordul, hogy megtalálom a matematika példa megoldását, de nem tudom elmagyarázni és bebizonyítani, hogyan jutottam el a megoldáshoz.","Könnyebben tanulok egy szöveget, ha olvasom, mint ha hallgatom.","Szívesebben tanulok az osztálytársammal vagy a barátommal, mint egyedül.","Fontos számomra, hogy megértsem a tanulnivaló tágabb összefüggéseit.","Tanulás közben nagyon zavaró, ha beszélgetnek körülöttem.","Általában átlátom a tananyag logikai felépítését.","Akkor tanulom meg könnyen a dolgokat, ha bemutatják, hogyan kell csinálni.","Szeretem hangosan átismételni a tanulnivaló főbb pontjait.","Jobban tudok tanulni, ha csend van körülöttem.","Jobban szeretem az olyan feladatokat, amin gondolkodni kell, mint azokat, ahol a tanultakat kell alkalmazni.","Könnyebben tanulok meg valamit, ha hangosan mondom, mintha csak magamban olvasom.","Sokszor eszembe jut, hogy mi lehet a válasz a tanár kérdésére, de nem tudom megindokolni, miért az jó válasz.","Dolgozatírásnál sokszor tudom, hogy a válasz a tankönyvben a lapon hol helyezkedik el.","Egyedül szeretek tanulni.","Könnyebben megtanulom a logikus dolgokat.","Akkor tanulok könnyen, ha közben szól a rádió, tv vagy a zene.","Jobban megértem a tankönyvben lévő szöveget, ha ábra is van hozzá.","Dolgozatírásnál vagy felelésnél szinte látom azt az oldalt, ahol az anyag a tankönyvben vagy füzetben van.","Amikor egy matematika példát megoldok, szinte minden lépést meg tudok indokolni, hogy miért tettem.","Szeretem, ha a tankönyvben az ábrák, táblázatok színesek.","Szívesebben tanulok hosszabb anyagrészeket, ahol látom az összefüggéseket, mint különálló leckéket.","Felelésnél gyakran szó szerint emlékszem a könyv vagy füzet szövegére.","Ha tanulok valamit, szeretem továbbgondolni azt.","Szeretek jegyzetelni.","Szeretek úgy tanulni, hogy rajzot, ábrát készítek közben.","Nem zavar tanulás közben, ha a háttérben megy a tv vagy szól a zene.","Szeretek másokkal csapatban dolgozni."];
+var REV=[1,14,16,27,44,46,49,56];
+var S=[
+["Auditív-aktív",[22,27,38,41],3.22,3.92,"hangos ismétlés, hangos olvasás"],
+["Auditív-befogadó",[14,20,23,28],3.23,4.11,"a hallott magyarázatból tanulás"],
+["Vizuális-ábra",[2,5,19,25,37,47,50,55],2.61,3.73,"ábrák, rajzok, bemutatás"],
+["Vizuális-szöveg",[3,4,12,30,32,43,48,52,54],3.38,4.03,"olvasás, jegyzetelés, a szöveg képe"],
+["Mozgás",[8,11,15,18,21,26],2.38,3.25,"mozgás, mozdulatok tanulás közben"],
+["Csend",[1,24,35,39,46,56],2.92,4.01,"csendet igénylő tanulás"],
+["Társas",[10,16,29,33,44,57],2.78,3.60,"páros és csoportos tanulás"],
+["Értelmes",[6,9,13,17,34,36,40,45,51,53],3.20,3.87,"összefüggések, logikai felépítés"],
+["Intuitív",[7,31,42,49],2.44,3.38,"megoldás indoklás nélkül"]];
+var qs=document.getElementById("qs");
+T.forEach(function(t,i){var d=document.createElement("div");d.className="card q";d.id="q"+(i+1);
+var h='<p><span class="n">'+(i+1)+'.</span>'+t+'</p><div class="opts">';
+for(var v=1;v<=5;v++)h+='<label><input type="radio" name="r'+(i+1)+'" value="'+v+'">'+v+'</label>';
+d.innerHTML=h+'</div><div class="legend"><span>egyáltalán nem</span><span>nagyon jellemző</span></div>';qs.appendChild(d);});
+function val(i){var e=document.querySelector('input[name="r'+i+'"]:checked');return e?+e.value:null}
+function prog(){var c=0;for(var i=1;i<=57;i++)if(val(i)!==null)c++;
+document.getElementById("pb").style.width=(c/57*100)+"%";document.getElementById("pt").textContent=c+" / 57";}
+qs.addEventListener("change",function(e){var q=e.target.closest(".q");if(q)q.classList.remove("miss");prog();});
+function pct(x){return((x-1)/4*100)+"%"}
+function fmt(x){return x.toFixed(2).replace(".",",")}
+document.getElementById("go").onclick=function(){
+var miss=[];for(var i=1;i<=57;i++)if(val(i)===null)miss.push(i);
+var err=document.getElementById("err");
+if(miss.length){miss.forEach(function(i){document.getElementById("q"+i).classList.add("miss")});
+err.textContent="Még "+miss.length+" állítás megválaszolatlan (pirossal jelölve).";
+document.getElementById("q"+miss[0]).scrollIntoView({behavior:"smooth",block:"center"});return;}
+err.textContent="";
+var h="";
+S.forEach(function(s){var sum=0;s[1].forEach(function(i){var v=val(i);sum+=REV.indexOf(i)>=0?6-v:v;});
+var m=sum/s[1].length,tag=m>s[3]?"sáv felett":(m<s[2]?"sáv alatt":"sávban");
+h+='<div class="sc"><h3><span>'+s[0]+' <span class="d">– '+s[4]+'</span></span><span class="tag"><b>'+fmt(m)+'</b> · '+tag+'</span></h3>'+
+'<div class="tr"><div class="bd" style="left:'+pct(s[2])+';width:'+((s[3]-s[2])/4*100)+'%"></div><div class="mk" style="left:'+pct(m)+'"></div></div>'+
+'<div class="tk"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div></div>';});
+document.getElementById("chart").innerHTML=h;
+var r=document.getElementById("res");r.style.display="block";r.scrollIntoView({behavior:"smooth"});};
+document.getElementById("demo").onclick=function(){
+for(var i=1;i<=57;i++){var v=[1,2,2,3,4,4,5][Math.floor(Math.random()*7)];
+document.querySelector('input[name="r'+i+'"][value="'+v+'"]').checked=true;}
+prog();document.getElementById("go").click();};
+document.getElementById("again").onclick=function(){
+document.querySelectorAll("#qs input").forEach(function(e){e.checked=false});
+document.getElementById("res").style.display="none";prog();window.scrollTo({top:0,behavior:"smooth"});};
+</script>
+</body>
+</html>
